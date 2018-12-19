@@ -58,30 +58,6 @@ pipeline {
         }
       }
     }
-    stage('DT Deploy Event') {
-    when {
-        expression {
-        return env.BRANCH_NAME ==~ 'release/.*' || env.BRANCH_NAME ==~'master'
-        }
-    }
-    steps {
-        createDynatraceDeploymentEvent(
-        envId: 'Dynatrace Tenant',
-        tagMatchRules: [
-            [
-            meTypes: [
-                [meType: 'SERVICE']
-            ],
-            tags: [
-                [context: 'CONTEXTLESS', key: 'app', value: "${env.APP_NAME}"],
-                [context: 'CONTEXTLESS', key: 'environment', value: 'dev']
-            ]
-            ]
-        ]) {
-        }
-        }
-      }
-
     stage('Run health check in dev') {
       when {
         expression {
@@ -90,7 +66,7 @@ pipeline {
       }
       steps {
         echo "Waiting for the service to start..."
-        sleep 160
+        sleep 150
 
         container('jmeter') {
           script {
@@ -156,7 +132,7 @@ pipeline {
         }
       }
     }
-    stage('Deploy to staging') {
+    stage('Deploy to staging environment') {
       when {
         beforeAgent true
         expression {
